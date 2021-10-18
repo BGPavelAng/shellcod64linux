@@ -1,3 +1,4 @@
+;//////////Codigo por Belial Grimoire////////////
 ;/usr/include/x86_64-linux-gnu/asm/unistd_64.h
 
 global _start
