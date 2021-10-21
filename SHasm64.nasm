@@ -57,10 +57,10 @@ dec rsi
 jns yumps
 
 
-push 0x3b
-pop rax
+push 0x3b     ;int execve(const char *fn, char *const argv[], char *const envp[])
+pop rax       ;#define __NR_execve 59
 
-xor rbx, rbx   ;int execve(const char *fn, char *const argv[], char *const envp[])
+xor rbx, rbx
 push rbx
 push rbx
 
