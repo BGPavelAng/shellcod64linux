@@ -36,7 +36,7 @@ push word 0x2     ;AF_INET
 
 mov rsi, rsp
 
-
-Código completo.
+Código completo en...
+Complete code on...
 https://www.patreon.com/BGPavelAng
 Ayudame a seguir haciendo más de esto.
